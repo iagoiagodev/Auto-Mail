@@ -5,6 +5,9 @@
 
 $ErrorActionPreference = "Stop"
 
+# Força o console a usar codificação UTF-8 para exibir os acentos corretamente
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 Write-Host "=================================================" -ForegroundColor Cyan
 Write-Host "   AutoMail - Instalador e Atualizador Automático  " -ForegroundColor Cyan
 Write-Host "=================================================" -ForegroundColor Cyan
