@@ -40,10 +40,9 @@ if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
         $installDir = Join-Path $basePath "AutoMail"
     }
 } else {
-    # Se cancelou, continua com o padrão
-    $defaultInstallDir = "$env:USERPROFILE\AutoMail"
-    $installDir = $defaultInstallDir
-    Write-Host "Seleção cancelada. Usando diretório padrão: $installDir" -ForegroundColor DarkGray
+    # Se cancelou, encerra a instalação
+    Write-Host "`n[!] Instalação cancelada pelo usuário. O script será encerrado." -ForegroundColor Red
+    exit 1
 }
 
 $tempZip = "$env:TEMP\AutoMail.zip"
