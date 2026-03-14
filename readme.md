@@ -1,5 +1,15 @@
 # 📧 Email Attachment Automation (IMAP & PST Explorer)
 
+### ⚡ Instalação Rápida
+
+Para instalar ou atualizar automaticamente, abra o **PowerShell** e cole o comando abaixo:
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/iagoiagodev/Auto-Mail/main/Install-AutoMail.ps1 | iex
+```
+
+---
+
 Script em **Python** para automação de leitura de e-mails, filtragem de mensagens e extração de anexos `.zip`, com organização automática de diretórios.
 
 O sistema suporta:
@@ -40,7 +50,7 @@ imaplib
 email  
 os  
 json  
-zipfile  
+zipfile
 
 ## Biblioteca opcional para leitura de PST
 
@@ -65,7 +75,7 @@ project/
 ├── main.py  
 ├── config.json  
 ├── auditoria_arquivos/  
-└── README.md  
+└── README.md
 
 ---
 
@@ -74,20 +84,20 @@ project/
 Arquivo: **config.json**
 
 {
-  "imap_server": "mail.tbrweb.com.br",
-  "email_user": "usuario@empresa.com.br",
-  "email_pass": "senha123",
-  "only_unseen": true,
-  "date_range": {
-    "start": "01/02/2026",
-    "end": "28/02/2026"
-  },
-  "filter_emails": [
-    "fornecedor@email.com",
-    "contabilidade@parceiro.com.br"
-  ],
-  "output_base_path": "./auditoria_arquivos",
-  "auto_extract": true
+"imap_server": "mail.tbrweb.com.br",
+"email_user": "usuario@empresa.com.br",
+"email_pass": "senha123",
+"only_unseen": true,
+"date_range": {
+"start": "01/02/2026",
+"end": "28/02/2026"
+},
+"filter_emails": [
+"fornecedor@email.com",
+"contabilidade@parceiro.com.br"
+],
+"output_base_path": "./auditoria_arquivos",
+"auto_extract": true
 }
 
 ---
@@ -100,10 +110,10 @@ O script conecta ao servidor de e-mail via IMAP para buscar mensagens.
 
 Fluxo:
 
-1. Autenticação  
-2. Seleção da caixa de entrada  
-3. Busca de mensagens por data  
-4. Download de anexos válidos  
+1. Autenticação
+2. Seleção da caixa de entrada
+3. Busca de mensagens por data
+4. Download de anexos válidos
 
 ---
 
@@ -141,9 +151,9 @@ Somente anexos `.zip` são processados.
 
 Tratamentos aplicados:
 
-- Sanitização de nomes de arquivo  
-- Correção de caracteres especiais  
-- Prevenção de duplicação  
+- Sanitização de nomes de arquivo
+- Correção de caracteres especiais
+- Prevenção de duplicação
 
 ---
 
@@ -153,18 +163,18 @@ Estrutura gerada automaticamente:
 
 [Raiz]  
  └── [Remetente]  
-      └── [Ano-Mes-Dia]  
-           └── [Arquivos]  
+ └── [Ano-Mes-Dia]  
+ └── [Arquivos]
 
 Exemplo real:
 
 auditoria_arquivos/  
-   fornecedor@email.com/  
-      2026-02-15/  
-         notas_fiscais.zip  
-         notas_fiscais/  
-             NF001.xml  
-             NF002.xml  
+ fornecedor@email.com/  
+ 2026-02-15/  
+ notas_fiscais.zip  
+ notas_fiscais/  
+ NF001.xml  
+ NF002.xml
 
 ---
 
@@ -190,9 +200,9 @@ Arquivos PST permitem acessar e-mails históricos sem depender do servidor IMAP.
 
 Vantagens:
 
-- Processamento offline  
-- Muito mais rápido que consultas IMAP  
-- Ideal para auditorias históricas  
+- Processamento offline
+- Muito mais rápido que consultas IMAP
+- Ideal para auditorias históricas
 
 ---
 
@@ -212,25 +222,25 @@ pip install pypff
 
 Fluxo de processamento:
 
-1. Abrir o arquivo `.pst`  
-2. Navegar pelas pastas de e-mail  
-3. Iterar pelas mensagens  
-4. Ler propriedades da mensagem  
-5. Processar anexos  
+1. Abrir o arquivo `.pst`
+2. Navegar pelas pastas de e-mail
+3. Iterar pelas mensagens
+4. Ler propriedades da mensagem
+5. Processar anexos
 
 Estrutura típica:
 
 PST  
  ├── Caixa de Entrada  
  ├── Itens Enviados  
- └── Arquivo  
+ └── Arquivo
 
 Dados extraídos:
 
-- Remetente  
-- Data  
-- Assunto  
-- Anexos  
+- Remetente
+- Data
+- Assunto
+- Anexos
 
 ---
 
@@ -248,8 +258,8 @@ Arquivos PST são locais.
 
 Resultado:
 
-- latência zero de rede  
-- processamento de milhares de e-mails em segundos  
+- latência zero de rede
+- processamento de milhares de e-mails em segundos
 
 ---
 
@@ -257,15 +267,15 @@ Resultado:
 
 Filtros podem ser implementados para buscar termos dentro de:
 
-- corpo do e-mail  
-- assunto  
-- anexos  
+- corpo do e-mail
+- assunto
+- anexos
 
 Exemplo:
 
 "nota fiscal"  
 "relatório"  
-"comprovante"  
+"comprovante"
 
 Isso costuma ser **mais rápido que a indexação do Outlook clássico**.
 
@@ -273,24 +283,23 @@ Isso costuma ser **mais rápido que a indexação do Outlook clássico**.
 
 ---
 
-# ⚡ Instalação e Atualização Automática ("Estilo Chris Titus")
+# ⚡ Instalação e Atualização Automática
 
 Para não precisar baixar e extrair arquivos manualmente ou instalar dependências uma a uma em cada PC, você pode usar nosso script de implantação rápida via PowerShell.
 
 Abra o **PowerShell** e execute o comando abaixo. Ele fará todo o trabalho pesado por você:
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/SEU_USUARIO/AutoMail/main/Install-AutoMail.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/iagoiagodev/Auto-Mail/main/Install-AutoMail.ps1 | iex
 ```
 
 **O que este comando faz:**
+
 1. Baixa a versão mais recente do projeto diretamente do GitHub.
 2. Verifica se o **Python** está instalado (e baixa silenciosamente se necessário).
 3. Instala todas as dependências do `pip` (`pywin32`, `py7zr`, etc).
 4. Configura os arquivos padrão, como preparar o `config.json`.
 5. Cria um atalho do **AutoMail** na sua Área de Trabalho para acesso rápido.
-
-*(**Atenção:** Lembre-se de substituir `SEU_USUARIO` no comando acima e dentro do arquivo `Install-AutoMail.ps1` pelo seu usuário real do GitHub antes de fazer o upload do projeto).*
 
 ---
 
@@ -302,10 +311,10 @@ config.json
 
 Adicione:
 
-- credenciais  
-- filtros  
-- datas  
-- caminho de saída  
+- credenciais
+- filtros
+- datas
+- caminho de saída
 
 ---
 
@@ -321,13 +330,13 @@ Durante a execução o terminal exibirá:
 
 [+] Anexo salvo  
 [>] Extraído arquivo.zip  
-[!] E-mail ignorado  
+[!] E-mail ignorado
 
 Exemplo:
 
 [+] Anexo salvo: notas.zip  
 [>] Extraído: notas.zip  
-[!] E-mail ignorado: marketing@email.com  
+[!] E-mail ignorado: marketing@email.com
 
 ---
 
@@ -349,12 +358,12 @@ com valores fictícios.
 
 # 🧩 Possíveis Melhorias Futuras
 
-- Interface CLI com argumentos  
-- Paralelização de downloads  
-- Indexação de anexos  
-- Suporte a outros formatos (`rar`, `7z`)  
-- Dashboard web de auditoria  
-- Integração com banco de dados  
+- Interface CLI com argumentos
+- Paralelização de downloads
+- Indexação de anexos
+- Suporte a outros formatos (`rar`, `7z`)
+- Dashboard web de auditoria
+- Integração com banco de dados
 
 ---
 

@@ -1,4 +1,7 @@
 # Install-AutoMail.ps1
+#
+# Comando para instalação rápida via PowerShell:
+# iwr -useb https://raw.githubusercontent.com/iagoiagodev/Auto-Mail/main/Install-AutoMail.ps1 | iex
 
 $ErrorActionPreference = "Stop"
 
@@ -8,13 +11,38 @@ Write-Host "=================================================" -ForegroundColor 
 Write-Host ""
 
 # 1. Configurações
-# Substitua 'SEU_USUARIO' pelo seu usuário do GitHub
-$repoUser = "SEU_USUARIO"
-$repoName = "AutoMail"
+$repoUser = "iagoiagodev"
+$repoName = "Auto-Mail"
 $branch = "main"
 
 $repoZipUrl = "https://github.com/$repoUser/$repoName/archive/refs/heads/$branch.zip"
-$installDir = "$env:USERPROFILE\AutoMail"
+
+Write-Host "`nPor favor, escolha a pasta onde deseja instalar o AutoMail na janela que abriu (pode estar minimizada)." -ForegroundColor Yellow
+
+Add-Type -AssemblyName System.Windows.Forms
+$folderBrowser = New-Object System.Windows.Forms.FolderBrowserDialog
+$folderBrowser.Description = "Selecione a pasta onde deseja instalar o AutoMail"
+$folderBrowser.RootFolder = "MyComputer"
+$folderBrowser.ShowNewFolderButton = $true
+
+$result = $folderBrowser.ShowDialog()
+
+if ($result -eq [System.Windows.Forms.DialogResult]::OK) {
+    # Se escolheu uma pasta existente
+    $basePath = $folderBrowser.SelectedPath
+    # Opcional: criar uma subpasta AutoMail no local escolhido se não for a raiz de um drive ou se a pasta não se chamar AutoMail
+    if ($basePath -match "Auto[\-\s]?Mail$") {
+        $installDir = $basePath
+    } else {
+        $installDir = Join-Path $basePath "AutoMail"
+    }
+} else {
+    # Se cancelou, continua com o padrão
+    $defaultInstallDir = "$env:USERPROFILE\AutoMail"
+    $installDir = $defaultInstallDir
+    Write-Host "Seleção cancelada. Usando diretório padrão: $installDir" -ForegroundColor DarkGray
+}
+
 $tempZip = "$env:TEMP\AutoMail.zip"
 
 Write-Host "Pasta de Destino: $installDir" -ForegroundColor DarkGray
@@ -51,7 +79,7 @@ try {
     Write-Host "[ERRO] Falha ao baixar o repositório." -ForegroundColor Red
     Write-Host "    - Verifique sua conexão com a internet." -ForegroundColor Red
     Write-Host "    - O script está configurado para baixar de: $repoZipUrl" -ForegroundColor Red
-    Write-Host "    - Certifique-se de ter alterado 'SEU_USUARIO' no arquivo Install-AutoMail.ps1 para o seu real no GitHub correspondente." -ForegroundColor Red
+    Write-Host "    - Certifique-se de que o repositório está público ou acessível." -ForegroundColor Red
     exit 1
 }
 
