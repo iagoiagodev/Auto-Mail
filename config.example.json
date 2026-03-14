@@ -1,0 +1,17 @@
+{
+  "imap_server": "mail.example.com",
+  "imap_port": 993,
+  "email_user": "usuario@empresa.com",
+  "email_pass": "sua_senha_aqui",
+  "only_unseen": true,
+  "date_range": { "start": "01/01/2026", "end": "31/01/2026" },
+  "filter_emails": [
+    "fornecedor@email.com",
+    { "email": "nfe@outro.com.br", "output_path": "C:/auditoria/nfe" },
+    { "email": "financeiro@empresa.com" }
+  ],
+  "output_base_path": "./auditoria_arquivos",
+  "auto_extract": true,
+  "allowed_extensions": [],
+  "pst_file": ""
+}
