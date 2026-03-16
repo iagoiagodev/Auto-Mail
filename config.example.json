@@ -13,5 +13,6 @@
   "output_base_path": "./auditoria_arquivos",
   "auto_extract": true,
   "allowed_extensions": [],
+  "blocked_extensions": [],
   "pst_file": ""
 }

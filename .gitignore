@@ -52,3 +52,5 @@ venv.bak/
 # Arquivos temporários ou de backup locais
 *.bak
 *.tmp
+.claude/settings.local.json
+/.claude

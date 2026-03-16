@@ -93,6 +93,11 @@ def validate_config(config):
                         f"use string ou {{\"email\": \"...\", \"output_path\": \"...\"}}"
                     )
 
+    if config.get("allowed_extensions") and config.get("blocked_extensions"):
+        errors.append(
+            "Use apenas 'allowed_extensions' OU 'blocked_extensions', nao os dois ao mesmo tempo"
+        )
+
     pst = config.get("pst_file", "").strip()
     if pst and not os.path.exists(pst):
         errors.append(f"pst_file = '{pst}' — arquivo nao encontrado")
@@ -277,7 +282,8 @@ def write_audit_log(relatorio, output_path, prefix="relatorio"):
 # ---------------------------------------------------------------------------
 
 def _process_email_attachments(raw_msg_bytes, sender_addr, msg_dt, folder,
-                                email_paths, base_path, auto_extract, allowed_extensions):
+                                email_paths, base_path, auto_extract,
+                                allowed_extensions, blocked_extensions):
     """
     Processa os anexos de um único e-mail.
     Executado em thread separada — não usa IMAP, apenas I/O de disco.
@@ -315,6 +321,14 @@ def _process_email_attachments(raw_msg_bytes, sender_addr, msg_dt, folder,
                 "data": date_str, "remetente": sender_addr, "assunto": subject,
                 "arquivo": raw_name, "pasta_email": folder, "caminho": "",
                 "status": f"ignorado (extensao {ext} nao permitida)",
+            })
+            continue
+        if blocked_extensions and ext in blocked_extensions:
+            print(f"[!] Anexo ignorado (extensao bloqueada): {raw_name}")
+            entries.append({
+                "data": date_str, "remetente": sender_addr, "assunto": subject,
+                "arquivo": raw_name, "pasta_email": folder, "caminho": "",
+                "status": f"ignorado (extensao {ext} bloqueada)",
             })
             continue
 
@@ -371,9 +385,12 @@ def process_imap(config):
     auto_extract = config.get("auto_extract", True)
     max_workers = config.get("max_workers", 4)
     allowed_extensions = {e.lower() for e in config.get("allowed_extensions", [])}
+    blocked_extensions = {e.lower() for e in config.get("blocked_extensions", [])}
 
     if allowed_extensions:
-        print(f"[*] Filtrando extensoes: {sorted(allowed_extensions)}")
+        print(f"[*] Extensoes permitidas (whitelist): {sorted(allowed_extensions)}")
+    elif blocked_extensions:
+        print(f"[*] Extensoes bloqueadas (blacklist): {sorted(blocked_extensions)}")
     else:
         print("[*] Extensoes: todas liberadas")
 
@@ -491,7 +508,7 @@ def process_imap(config):
         raw, sender, dt, folder_name = args
         return _process_email_attachments(
             raw, sender, dt, folder_name,
-            email_paths, base_path, auto_extract, allowed_extensions,
+            email_paths, base_path, auto_extract, allowed_extensions, blocked_extensions,
         )
 
     with ThreadPoolExecutor(max_workers=max_workers) as executor:
@@ -684,6 +701,15 @@ def process_pst(config):
     auto_extract = config.get("auto_extract", True)
     max_workers = config.get("max_workers", 4)
     allowed_extensions = {e.lower() for e in config.get("allowed_extensions", [])}
+    blocked_extensions = {e.lower() for e in config.get("blocked_extensions", [])}
+
+    if allowed_extensions:
+        print(f"[*] Extensoes permitidas (whitelist): {sorted(allowed_extensions)}")
+    elif blocked_extensions:
+        print(f"[*] Extensoes bloqueadas (blacklist): {sorted(blocked_extensions)}")
+    else:
+        print("[*] Extensoes: todas liberadas")
+
     start_dt = datetime.strptime(config["date_range"]["start"], "%d/%m/%Y")
     end_dt = datetime.strptime(config["date_range"]["end"], "%d/%m/%Y").replace(
         hour=23, minute=59, second=59
@@ -841,6 +867,14 @@ def process_pst(config):
                                 "assunto": subject, "arquivo": att_name,
                                 "pasta_email": folder_name, "caminho": "",
                                 "status": f"ignorado (extensao {ext} nao permitida)",
+                            })
+                            continue
+                        if blocked_extensions and ext in blocked_extensions:
+                            relatorio.append({
+                                "data": date_str, "remetente": sender_addr,
+                                "assunto": subject, "arquivo": att_name,
+                                "pasta_email": folder_name, "caminho": "",
+                                "status": f"ignorado (extensao {ext} bloqueada)",
                             })
                             continue
 
@@ -1223,6 +1257,19 @@ def show_gui(config):
     ent_exts.pack(side="left")
     _sel_all(ent_exts)
 
+    row_blk = tk.Frame(frm_opts)
+    row_blk.pack(fill="x", pady=2)
+    tk.Label(row_blk, text="Extensoes bloqueadas:",
+             font=("Segoe UI", 9)).pack(side="left")
+    tk.Label(row_blk, text="(vazio = nenhuma)",
+             font=("Segoe UI", 8), fg="#888").pack(side="left", padx=(4, 8))
+    blk_raw = last.get("blocked_extensions", config.get("blocked_extensions", []))
+    blk_str = ", ".join(blk_raw) if isinstance(blk_raw, list) else str(blk_raw)
+    blk_var = tk.StringVar(value=blk_str)
+    ent_blk = tk.Entry(row_blk, textvariable=blk_var, width=36, font=("Segoe UI", 9))
+    ent_blk.pack(side="left")
+    _sel_all(ent_blk)
+
     # ── BOTÕES ────────────────────────────────────────────────────────────
     frm_btn = tk.Frame(root)
     frm_btn.grid(row=4, column=0, pady=(0, PAD))
@@ -1250,6 +1297,19 @@ def show_gui(config):
             [x.strip().lower() for x in exts_input.split(",") if x.strip()]
             if exts_input else []
         )
+
+        blk_input = blk_var.get().strip()
+        blocked_exts = (
+            [x.strip().lower() for x in blk_input.split(",") if x.strip()]
+            if blk_input else []
+        )
+
+        if allowed_exts and blocked_exts:
+            messagebox.showerror(
+                "Erro",
+                "Preencha apenas 'Extensoes permitidas' OU 'Extensoes bloqueadas', nao os dois."
+            )
+            return
 
         tab_idx = notebook.index(notebook.select())
         mode = "pst" if tab_idx == 0 else "imap"
@@ -1288,6 +1348,7 @@ def show_gui(config):
             "output_base_path": default_out,
             "auto_extract": auto_var.get(),
             "allowed_extensions": allowed_exts,
+            "blocked_extensions": blocked_exts,
         })
 
         to_save = {k: v for k, v in result.items() if k != "email_pass"}
