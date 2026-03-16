@@ -129,16 +129,21 @@ try {
 Write-Host "[OK] Dependências instaladas e configuradas." -ForegroundColor Green
 
 # 6. Criar Atalho no Desktop
-$shortcutPath = "$env:USERPROFILE\Desktop\AutoMail.lnk"
+$desktopPath = [Environment]::GetFolderPath('Desktop')
+$shortcutPath = "$desktopPath\AutoMail.lnk"
 if (-not (Test-Path $shortcutPath)) {
     Write-Host "`n[*] Criando atalho na Área de Trabalho..." -ForegroundColor Yellow
-    $WshShell = New-Object -comObject WScript.Shell
-    $Shortcut = $WshShell.CreateShortcut($shortcutPath)
-    $Shortcut.TargetPath = "$installDir\AutoMail.bat"
-    $Shortcut.WorkingDirectory = $installDir
-    $Shortcut.IconLocation = "$installDir\AutoMail.bat" # Tenta usar o icone, ou se tiver .ico passe o path aqui
-    $Shortcut.Save()
-    Write-Host "[OK] Atalho 'AutoMail' criado na Área de Trabalho." -ForegroundColor Green
+    if (-not (Test-Path $desktopPath)) {
+        Write-Host "[!] Área de Trabalho não encontrada em '$desktopPath'. Atalho não criado." -ForegroundColor DarkYellow
+    } else {
+        $WshShell = New-Object -comObject WScript.Shell
+        $Shortcut = $WshShell.CreateShortcut($shortcutPath)
+        $Shortcut.TargetPath = "$installDir\AutoMail.bat"
+        $Shortcut.WorkingDirectory = $installDir
+        $Shortcut.IconLocation = "$installDir\AutoMail.bat"
+        $Shortcut.Save()
+        Write-Host "[OK] Atalho 'AutoMail' criado na Área de Trabalho." -ForegroundColor Green
+    }
 }
 
 Write-Host "`n=================================================" -ForegroundColor Cyan
